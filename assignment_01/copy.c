@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 
     char* src_file = argv[1];
     char* des_file = argv[2];
-    char data[101];
+    char data[100];
     memset(data, '\0', sizeof(data));
 
     int src_fd = 0; /* file descriptor */
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     while(read(src_fd, data, 100) > 0) {
         write(des_fd, data, 100);
     }
-    
+
     close(src_fd);
     close(des_fd);
 
