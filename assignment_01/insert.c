@@ -19,38 +19,31 @@ int main(int argc, char* argv[]) {
     char* des_file = argv[1];
     int offset = atoi(argv[2]);
     char* data = argv[3];
-    char buf_1[10], buf_2[10];
+    char buf_1[255];
     int fd = 0;
+    int pivot = 0;
+    int final = 0;
 
-    int final = lseek(fd, 0, SEEK_END);
-    lseek(fd, 0, SEEK_SET);
+    memset(buf_1, '\0', sizeof(buf_1));
 
     if ((fd = open(des_file, O_RDWR)) < 0) {
         fprintf(stderr, "<des_file> open error.\n");
         return -1;
     }
 
-    if (lseek(fd, offset, SEEK_SET) < 0) {
+    if ((pivot = lseek(fd, offset, SEEK_SET)) < 0) {
         fprintf(stderr, "seeking error.\n");
         return -1;
     }
 
-    read(fd, buf_1, 10);
-    lseek(fd, -10, SEEK_CUR);
-    write(fd, data, 10);
-    lseek(fd, -1, SEEK_CUR);
-
-    while(1) {
-
-        strncpy(buf_2, buf_1, 10);
-        read(fd, buf_1, 10);
-        lseek(fd, -10, SEEK_CUR);
-        write(fd, buf_2, 10);
-        lseek(fd, -1, SEEK_CUR);
-        if (lseek(fd, 0, SEEK_CUR) >= final)
-            break;
-        printf("%s\n", buf_2);
+    if (read(fd, buf_1, offset) < 0) {
+        fprintf(stderr, "seeking error.\n");
+        return -1;
     }
+
+    lseek(fd, pivot, SEEK_SET);
+    write(fd, data, 10);
+    write(fd, buf_1, strlen(buf_1));
 
     close(fd);
         
